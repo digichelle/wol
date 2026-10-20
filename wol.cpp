@@ -4,8 +4,7 @@ wol.cpp - Simple Wake-On-LAN utility
 Author:  Michelle Catherine Marcó (digichelle)
 Source:  https://github.com/digichelle/wol
 
-Compile: clang++ -Wall -Os -DNDEBUG -std=c++23 -o wol wol.cpp (BSD/Linux/macOS)
-         ... (Windows)
+Compile: clang++ -Wall -Os -DNDEBUG -std=c++23 -o wol wol.cpp
 
 MIT LICENSE
 Copyright © 2026 Michelle Catherine Marcó
@@ -37,17 +36,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdexcept>        // Error handling (types)
 #include <errno.h>          // Error handling (numbers)
 #include <getopt.h>         // Provides getopt_long()
-
-#ifdef _WIN32
-#include <winsock2.h>       // Socket programming (Windows)
-#include <ws2tcpip.h>       // Provides inet_pton()
-#pragma comment(lib, "Ws2_32.lib") // Link Winsock library for MSVC
-#else
 #include <arpa/inet.h>      // Provides inet_addr()
 #include <netinet/in.h>     // Internet address structures
 #include <sys/socket.h>     // Socket programming (BSD/Linux/macOS)
 #include <unistd.h>         // Provides close()
-#endif
 
 using namespace std;
 
@@ -70,7 +62,7 @@ void PrintVersion(const string& progname) {
         progname << " - Simple Wake-ON-LAN utility\n" <<
         "Version 1.0β3\n" <<
         "Copyright © 2026 Michelle Catherine Marcó\n" <<
-        "MIT License\n" <<
+        "MIT License\n";
     exit(0);
 }
 
@@ -170,31 +162,6 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
     // Convert const string to const char * for use in inet_addr() or inet_pton()
     const char *ipaddr = ip.c_str();
 
-#ifdef _WIN32
-    // Initialize Winsock
-    WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        throw runtime_error("Error: Could not initialize Winsock");
-        return false;
-    }
-
-    // Create a UDP socket
-    SOCKET sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (sock == INVALID_SOCKET) {
-        throw runtime_error("Error: Could not create socket, error code: " + WSAGetLastError());
-        WSACleanup();
-        return false;
-    }
-
-    // Allow the socket to send broadcast messages
-    BOOL broadcast = TRUE;
-    if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char*)&broadcast, sizeof(broadcast)) == SOCKET_ERROR) {
-        throw runtime_error("Error: Could not set broadcast option, error code: " + WSAGetLastError());
-        closesocket(sock);
-        WSACleanup();
-        return false;
-    }
-#else
     // Create a UDP socket
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
@@ -209,49 +176,24 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
         close(sock);
         return false;
     }
-#endif
 
     // Set up the destination
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-#ifdef _WIN32
-    if (inet_pton(AF_INET, ipaddr, &addr.sin_addr) <= 0) {
-        throw runtime_error("Error: Invalid broadcast address");
-        closesocket(sock);
-        WSACleanup();
-        return false;
-    }
-#else
     addr.sin_addr.s_addr = inet_addr(ipaddr);
-#endif
 
     // Send the packet
-#ifdef _WIN32
-    int sent = sendto(sock, (const char*)packet.data(), packet.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
-    if (sent == SOCKET_ERROR) {
-        throw runtime_error("Error: Failed to send packet, error code: " + WSAGetLastError());
-        closesocket(sock);
-        WSACleanup();
-        return false;
-    }
-#else
     ssize_t sent = sendto(sock, packet.data(), packet.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
     if (sent < 0) {
         throw runtime_error("Error: Failed to send packet");
         close(sock);
         return false;
     }
-#endif
 
     // Clean up
-#ifdef _WIN32
-    closesocket(sock);
-    WSACleanup();
-#else
     close(sock);
-#endif
     return true;
 
 }
