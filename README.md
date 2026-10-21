@@ -1,11 +1,11 @@
 # wol
-A simple Wake-on-LAN utility written in C++. Compatible with BSD, Linux, and macOS.
+A simple Wake-on-LAN utility written in C++. Compatible with Linux and macOS.
 
 ## Requirements
 
-### All
+### Linux
 - `git` (if cloning the repository)
-- `clang` (or `gcc`)
+- `clang`
 - `make`
 
 ### macOS
@@ -18,17 +18,14 @@ A simple Wake-on-LAN utility written in C++. Compatible with BSD, Linux, and mac
 ```
 git clone https://github.org/digichelle/wol
 cd wol
-make all
 make install
 ```
 
-### Manual Compilation
+### Compile Only
 
 ```
-clang++ -Wall -Os -std=c++23 -o wol wol.cpp
+make all
 ```
-
-**Note:** `g++` can be used instead of `clang++`, if desired.
 
 ### Clean After Compilation/Installation
 

@@ -4,8 +4,6 @@ wol.cpp - Simple Wake-On-LAN utility
 Author:  Michelle Catherine Marcó (digichelle)
 Source:  https://github.com/digichelle/wol
 
-Compile: clang++ -Wall -Os -std=c++23 -o wol wol.cpp
-
 MIT LICENSE
 Copyright © 2026 Michelle Catherine Marcó
 
@@ -33,8 +31,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <cstring>          // Provides memset()
 #include <regex>            // Provides regular expression support
 #include <vector>           // Byte storage
-#include <stdexcept>        // Error handling (types)
-#include <errno.h>          // Error handling (numbers)
 #include <getopt.h>         // Provides getopt_long()
 #include <arpa/inet.h>      // Provides inet_addr()
 #include <netinet/in.h>     // Internet address structures
@@ -47,10 +43,10 @@ using namespace std;
 void PrintUsage(const string& progname) {
     cout <<
         progname << " - Simple Wake-On-LAN utility\n" <<
-        "Usage: " << progname << " [OPTIONS]... MAC-ADDRESS\n" <<
+        "Usage: " << progname << " [OPTIONS] ... MAC-ADDRESS\n" <<
         "    -h, --help     Display this help and exit\n" <<
         "    -v, --version  Display version and license information\n" <<
-        "    -b, --ip       Specify broadcast IP address\n" <<
+        "    -i, --ip       Specify broadcast IP address\n" <<
         "    -p, --port     Specify port number\n" <<
         "    -q, --quiet    Quiet mode\n";
     exit(0);
@@ -60,7 +56,7 @@ void PrintUsage(const string& progname) {
 void PrintVersion(const string& progname) {
     cout <<
         progname << " - Simple Wake-ON-LAN utility\n" <<
-        "Version 1.0β3\n" <<
+        "Version 1.0β4\n" <<
         "Copyright © 2026 Michelle Catherine Marcó\n" <<
         "MIT License\n";
     exit(0);
@@ -165,14 +161,14 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
     // Create a UDP socket
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
-        throw runtime_error("Error: Could not create socket");
+        cerr << "Error: Could not create socket" << endl;
         return false;
     }
 
     // Allow the socket to send broadcast messages
     int broadcast = 1;
     if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0) {
-        throw runtime_error("Error: Could not set broadcast option");
+        cerr << "Error: Could not set broadcast option" << endl;
         close(sock);
         return false;
     }
@@ -187,7 +183,7 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
     // Send the packet
     ssize_t sent = sendto(sock, packet.data(), packet.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
     if (sent < 0) {
-        throw runtime_error("Error: Failed to send packet");
+        cerr << "Error: Failed to send packet" << endl;
         close(sock);
         return false;
     }
@@ -209,16 +205,16 @@ int main(int argc, char * const argv[]) {
 
         // Parse command line arguments using getopt_long
         // (this allows both short and long forms)
-        const char* const short_opts = "hvqb:p:";
+        const char* const short_opts = "hvqi:p:";
         const option long_opts[] {
             { "help", no_argument, NULL, 'h' },
             { "version", no_argument, NULL, 'v' },
             { "quiet", no_argument, NULL, 'q' },
-            { "ip", required_argument, NULL, 'b' },
+            { "ip", required_argument, NULL, 'i' },
             { "port", required_argument, NULL, 'p' },
             { NULL, no_argument, NULL, 0 }
         };
-        
+
         while (true) {
             const auto opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
             if (-1 == opt)
@@ -233,16 +229,16 @@ int main(int argc, char * const argv[]) {
                 case 'q': // -q, --quiet
                     quiet = true;
                     break;
-                case 'b': // -b, --ip
+                case 'i': // -i, --ip
                     IPAddress = optarg;
                     break;
                 case 'p': // -p, --port
                     port = strtol(optarg, NULL, 0);
                     break;
                 case '?': // Unrecognized option
-                    throw runtime_error(string("Unknown option '-") + static_cast<char>(optopt) + "'");
+                    cerr << "Unknown option '-" << static_cast<char>(optopt) << "'" << endl;
                 default:
-                    throw runtime_error("Internal error");
+                    cerr << "Internal error" << endl;
             }
         }
 
@@ -252,17 +248,17 @@ int main(int argc, char * const argv[]) {
             // Parse the MAC address into bytes and validate
             auto MACBytes = ParseMAC(mac);
             if (MACBytes.size() != 6) {
-                throw runtime_error("Error: Invalid MAC address (Note: format must be XX:XX:XX:XX:XX:XX)");
+                cerr << "Error: Invalid MAC address (Note: format must be XX:XX:XX:XX:XX:XX)" << endl;
             }
 
             // Validate IP address
             if (!ValidateIPAddress(IPAddress)) {
-                throw runtime_error("Error: Invalid IP address");
+                cerr << "Error: Invalid IP address" << endl;
             }
 
             // Validate port number
             if (!ValidatePort(port)) {
-                throw runtime_error("Error: Invalid port number");
+                cerr << "Error: Invalid port number" << endl;
             }
 
             // Create the magic packet
@@ -272,7 +268,7 @@ int main(int argc, char * const argv[]) {
             if (!SendPacket(packet, IPAddress, port)) {
                 return 1; // Exit with error if sending fails
             }
-            
+
             if (!quiet) {
                 cout <<
                     "Wake-on-LAN magic packet sent!\n" <<
