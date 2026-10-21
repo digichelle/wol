@@ -4,7 +4,7 @@ wol.cpp - Simple Wake-On-LAN utility
 Author:  Michelle Catherine Marcó (digichelle)
 Source:  https://github.com/digichelle/wol
 
-Compile: clang++ -Wall -Os -DNDEBUG -std=c++23 -o wol wol.cpp
+Compile: clang++ -Wall -Os -std=c++23 -o wol wol.cpp
 
 MIT LICENSE
 Copyright © 2026 Michelle Catherine Marcó

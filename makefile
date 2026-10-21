@@ -4,7 +4,7 @@
 CXX = clang++
 
 # Compiler flags
-CXXFLAGS = -Wall -Os -DNDEBUG -std=c++23
+CXXFLAGS = -Wall -Os -std=c++23
 
 # Define certain rules as phony
 .PHONY: install

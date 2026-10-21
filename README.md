@@ -25,7 +25,7 @@ make install
 ### Manual Compilation
 
 ```
-clang++ -Wall -Os -DNDEBUG -std=c++23 -o wol wol.cpp
+clang++ -Wall -Os -std=c++23 -o wol wol.cpp
 ```
 
 **Note:** `g++` can be used instead of `clang++`, if desired.
