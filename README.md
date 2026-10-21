@@ -45,8 +45,8 @@ wol aa:bb:cc:dd:ee:ff
 ### Specify Broadcast IP Address and/or Port
 
 ```
-wol -b 255.255.255.255 -p 9 aa:bb:cc:dd:ee:ff
-wol -b 255.255.255.255 aa:bb:cc:dd:ee:ff
+wol -i 255.255.255.255 -p 9 aa:bb:cc:dd:ee:ff
+wol -i 255.255.255.255 aa:bb:cc:dd:ee:ff
 wol -p 9 aa:bb:cc:dd:ee:ff
 ```
 
