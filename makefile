@@ -40,7 +40,7 @@ endif
 ifeq ($(PLATFORM),linux)
 	CXX = clang++
 	CXXFLAGS = -Wall -Os -std=c++11 -faddrsig -flto -fdata-sections -ffunction-sections
-	LDFLAGS = -fuse-ld=lld -Wl,-icf=safe -Wl,-s -Wl,--gc-sections
+	LDFLAGS = -fuse-ld=lld -Wl,--icf=safe -Wl,-s -Wl,--gc-sections
 endif
 # macOS
 ifeq ($(PLATFORM),macos)
@@ -65,6 +65,7 @@ OBJS = $(SRCS:.cpp=.o)
 
 # Default rule to build the executable
 all: $(TARGET)
+	./stripbin $(TARGET)
 
 # Rule to link object files into the target executable
 $(TARGET): $(OBJS)

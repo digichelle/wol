@@ -237,8 +237,10 @@ int main(int argc, char * const argv[]) {
                     break;
                 case '?': // Unrecognized option
                     cerr << "Unknown option '-" << static_cast<char>(optopt) << "'" << endl;
+                    exit(1);
                 default:
                     cerr << "Internal error" << endl;
+                    exit(1);
             }
         }
 
@@ -249,16 +251,19 @@ int main(int argc, char * const argv[]) {
             auto MACBytes = ParseMAC(mac);
             if (MACBytes.size() != 6) {
                 cerr << "Error: Invalid MAC address (Note: format must be XX:XX:XX:XX:XX:XX)" << endl;
+                exit(1);
             }
 
             // Validate IP address
             if (!ValidateIPAddress(IPAddress)) {
                 cerr << "Error: Invalid IP address" << endl;
+                exit(1);
             }
 
             // Validate port number
             if (!ValidatePort(port)) {
                 cerr << "Error: Invalid port number" << endl;
+                exit(1);
             }
 
             // Create the magic packet
