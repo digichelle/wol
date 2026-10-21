@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Quick and dirty bash script to call strip via makefile
+# (because strip can't be called directly in a makefile)
+
+if [[ -z $1 ]] then
+    echo "Error: no file specified" >&2
+else
+    strip $1
+fi
