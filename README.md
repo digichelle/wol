@@ -6,6 +6,7 @@ A simple Wake-on-LAN utility written in C++. Compatible with Linux and macOS.
 ### Linux
 - `git` (if cloning the repository)
 - `clang`
+- `lld`
 - `make`
 
 ### macOS
