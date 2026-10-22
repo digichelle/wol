@@ -27,9 +27,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ***************************************************************************** */
 
 #include <iostream>         // Basic I/O
-#include <string>           // String handling
+#include <algorithm>        // Provides all_of()
 #include <cstring>          // Provides memset()
 #include <regex>            // Provides regular expression support
+#include <string>           // String handling
 #include <vector>           // Byte storage
 #include <getopt.h>         // Provides getopt_long()
 #include <arpa/inet.h>      // Provides inet_addr()
@@ -48,7 +49,13 @@ void PrintUsage(const string& progname) {
         "    -v, --version  Display version and license information\n" <<
         "    -i, --ip       Specify broadcast IP address\n" <<
         "    -p, --port     Specify port number\n" <<
-        "    -q, --quiet    Quiet mode\n";
+        "    -q, --quiet    Quiet mode\n" <<
+        "\n" <<
+        "MAC address must be in the form x:x:x:x:x:x, where x is a zero-padded\n" <<
+        "hexadecimal number from 00 to ff.\n" <<
+        "\n" <<
+        "IP address, if specified, must be in the form x.x.x.x, where x is a\n" <<
+        "decimal number from 0 to 255.\n\n";
     exit(0);
 }
 
@@ -56,23 +63,25 @@ void PrintUsage(const string& progname) {
 void PrintVersion(const string& progname) {
     cout <<
         progname << " - Simple Wake-ON-LAN utility\n" <<
-        "Version 1.0β4\n" <<
+        "Version 1.0β5\n" <<
         "Copyright © 2026 Michelle Catherine Marcó\n" <<
-        "MIT License\n";
+        "MIT License: https://opensource.org/license/MIT\n\n";
     exit(0);
 }
 
 // Function to validate IP address
 bool ValidateIPAddress(const string& ip) {
 
-    // Convert const string to const char * for use in regex_match()
-    const char *ipaddr = ip.c_str();
+    // Make sure IP address is not greater than 15 bytes
+    if (ip.size() > 15) {
+        return false;
+    }
 
     // Define regular expression
     const auto ipv4 = regex(R"(^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$)");
 
     // Check if supplied IP address matches regular expression
-    if (regex_match(ipaddr, ipv4)) {
+    if (regex_match(ip.c_str(), ipv4)) {
         return true;
     }
 
@@ -80,17 +89,30 @@ bool ValidateIPAddress(const string& ip) {
 }
 
 // Function to validate port
-bool ValidatePort(unsigned port) {
+bool ValidatePort(const string& portstr) {
 
-    // Valid port number must be an integer from 0 to 65535
-    if (port < 0 || port > 65535) {
+    // Make sure port is not greater than 5 bytes
+    if (portstr.size() > 5) {
+        return false;
+    }
+
+    // Valid port number must be all digits
+    if (!all_of(portstr.begin(), portstr.end(), ::isdigit)) {
+        return false;
+    }
+
+    // Convert string to integer
+    unsigned port = strtol(portstr.c_str(), NULL, 0);
+
+    // Valid port number must be an integer from 1 to 65535
+    if (port < 1 || port > 65535) {
         return false;
     }
 
     return true;
 }
 
-// Function to turn MAC address (like "00:11:22:33:44:55") into bytes
+// Function to turn MAC address (like "aa:bb:cc:dd:ee:ff") into bytes
 vector<unsigned char> ParseMAC(const string& mac) {
     vector<unsigned char> bytes;
     size_t start = 0;
@@ -155,9 +177,6 @@ vector<unsigned char> CreateMagicPacket(const vector<unsigned char>& mac) {
 // Function to send the magic packet over the network
 bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned port) {
 
-    // Convert const string to const char * for use in inet_addr() or inet_pton()
-    const char *ipaddr = ip.c_str();
-
     // Create a UDP socket
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
@@ -178,7 +197,7 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = inet_addr(ipaddr);
+    addr.sin_addr.s_addr = inet_addr(ip.c_str());
 
     // Send the packet
     ssize_t sent = sendto(sock, packet.data(), packet.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
@@ -197,10 +216,11 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
 int main(int argc, char * const argv[]) {
     try {
 
-        // Set defaults
+        // Initialize variables with defaults
         bool quiet = false;
         string mac = argv[argc - 1];
         string IPAddress = "255.255.255.255";
+        string portstr = "9";
         unsigned port = 9;
 
         // Parse command line arguments using getopt_long
@@ -233,6 +253,7 @@ int main(int argc, char * const argv[]) {
                     IPAddress = optarg;
                     break;
                 case 'p': // -p, --port
+                    portstr = optarg;
                     port = strtol(optarg, NULL, 0);
                     break;
                 case '?': // Unrecognized option
@@ -247,22 +268,47 @@ int main(int argc, char * const argv[]) {
         // Do the thing!
         if (optind == argc - 1) {
 
+            // Initalize error handling variables
+            bool ValidMAC = true;
+            bool ValidIPAddress = true;
+            bool ValidPort = true;
+            int errors = 0;
+
             // Parse the MAC address into bytes and validate
             auto MACBytes = ParseMAC(mac);
             if (MACBytes.size() != 6) {
-                cerr << "Error: Invalid MAC address (Note: format must be XX:XX:XX:XX:XX:XX)" << endl;
-                exit(1);
+                ValidMAC = false;
+                errors++;
             }
 
             // Validate IP address
             if (!ValidateIPAddress(IPAddress)) {
-                cerr << "Error: Invalid IP address" << endl;
-                exit(1);
+                ValidIPAddress = false;
+                errors++;
             }
 
             // Validate port number
-            if (!ValidatePort(port)) {
-                cerr << "Error: Invalid port number" << endl;
+            if (!ValidatePort(portstr)) {
+                ValidPort = false;
+                errors++;
+            }
+
+            // Display errors if errors > 0
+            if (errors > 0) {
+                if (errors == 1) {
+                    cerr << "1 error:\n";
+                } else {
+                    cerr << errors << " errors:\n";
+                }
+                if (!ValidMAC) {
+                    cerr << "    Invalid MAC address\n";
+                }
+                if (!ValidIPAddress) {
+                    cerr << "    Invalid IP address\n";
+                }
+                if (!ValidPort) {
+                    cerr << "    Invalid port\n";
+                }
                 exit(1);
             }
 
