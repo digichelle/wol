@@ -4,34 +4,42 @@ A simple Wake-on-LAN utility written in C++. Compatible with Linux and macOS.
 ## Requirements
 
 ### Linux
-- `git` (if cloning the repository)
-- `clang`
-- `lld`
-- `make`
+- Git
+- Clang
+- lld
+- CMake
+- make
 
 ### macOS
+- CMake
 - [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools)
 
 ## Compilation and Installation
 
-### Quick Compile and Install
+### Initial Setup
 
 ```
 git clone https://github.org/digichelle/wol
 cd wol
-make install
+cmake -S . -B build --fresh
 ```
 
-### Compile Only
+### Compile
 
 ```
-make all
+cmake --build build
 ```
 
-### Clean After Compilation/Installation
+### Install
 
 ```
-make clean
+sudo cmake --install build --strip
+```
+
+### Clean After Compilation and/or Installation
+
+```
+cmake --build build --target clean
 ```
 
 ## Usage
