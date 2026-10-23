@@ -9,10 +9,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_compile_options(-Wall -Os -faddrsig -flto -fdata-sections -ffunction-sections -std=c++11)
     add_link_options(-fuse-ld=lld -faddrsig -flto -fdata-sections -ffunction-sections -Wl,--icf=safe -Wl,--gc-sections)
 endif()
-# macos
+# macOS
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     add_compile_options(-Wall -Os -faddrsig -flto -fdata-sections -ffunction-sections -std=c++11)
     add_link_options(-faddrsig -flto -fdata-sections -ffunction-sections)
+endif()
+# Windows
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    add_compile_options(-Wall -Os -faddrsig -flto -fdata-sections -ffunction-sections -std=c++11)
+    add_link_options(-fuse-ld=lld -faddrsig -flto -fdata-sections -ffunction-sections -Wl,--icf=safe -Wl,--gc-sections)
 endif()
 
 add_executable(${PROJECT_NAME} "src/wol.cpp")

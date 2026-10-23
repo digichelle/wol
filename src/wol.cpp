@@ -1,8 +1,8 @@
 /* *****************************************************************************
 
 wol.cpp - Simple Wake-On-LAN utility
-Author:  Michelle Catherine Marcó (digichelle)
-Source:  https://github.com/digichelle/wol
+Author: Michelle Catherine Marcó (digichelle)
+Source: https://github.com/digichelle/wol
 
 MIT LICENSE
 Copyright © 2026 Michelle Catherine Marcó
@@ -63,10 +63,29 @@ void PrintUsage(const string& progname) {
 void PrintVersion(const string& progname) {
     cout <<
         progname << " - Simple Wake-ON-LAN utility\n" <<
-        "Version 1.0β5\n" <<
+        "Version 1.0β6\n" <<
         "Copyright © 2026 Michelle Catherine Marcó\n" <<
         "MIT License: https://opensource.org/license/MIT\n\n";
     exit(0);
+}
+
+// Function to validate MAC address
+bool ValidateMACAddress(const string& mac) {
+
+    // Make sure MAC address is not greater than 17 bytes
+    if (mac.size() > 17) {
+        return false;
+    }
+
+    // Define regular expression
+    const auto macaddr = regex(R"(([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2})");
+
+    // Check if supplied MAC address matches regular expression
+    if (regex_match(mac.c_str(), macaddr)) {
+        return true;
+    }
+
+    return false;
 }
 
 // Function to validate IP address
@@ -274,9 +293,8 @@ int main(int argc, char * const argv[]) {
             bool ValidPort = true;
             int errors = 0;
 
-            // Parse the MAC address into bytes and validate
-            auto MACBytes = ParseMAC(mac);
-            if (MACBytes.size() != 6) {
+            // Validate MAC address and convert to bytes if valid
+            if (!ValidateMACAddress(mac)) {
                 ValidMAC = false;
                 errors++;
             }
@@ -311,6 +329,9 @@ int main(int argc, char * const argv[]) {
                 }
                 exit(1);
             }
+
+            // Convert MAC address to bytes
+            auto MACBytes = ParseMAC(mac);
 
             // Create the magic packet
             auto packet = CreateMagicPacket(MACBytes);
