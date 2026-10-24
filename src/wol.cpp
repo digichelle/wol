@@ -327,6 +327,7 @@ int main(int argc, char * const argv[]) {
                 if (!ValidPort) {
                     cerr << "    Invalid port\n";
                 }
+                cerr << endl;
                 exit(1);
             }
 
