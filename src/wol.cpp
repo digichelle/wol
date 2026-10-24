@@ -346,7 +346,7 @@ int main(int argc, char * const argv[]) {
                     "Wake-on-LAN magic packet sent!\n" <<
                     "    MAC Address: " << mac << "\n" <<
                     "    IP Address:  " << IPAddress << "\n" <<
-                    "    Port:        " << dec << port << "\n";
+                    "    Port:        " << dec << port << "\n\n";
             }
 
         } else {
