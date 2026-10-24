@@ -1,18 +1,29 @@
 # wol
-A simple Wake-on-LAN utility written in C++. Compatible with Linux and macOS.
+A simple Wake-on-LAN utility written in C++. Compatible with Linux, macOS, and Windows.
 
 ## Requirements
 
 ### Linux
-- Git
-- Clang
-- lld
-- CMake
-- make
+- Git ≥ 2.54.0
+- Clang ≥ 21.0.0
+- lld ≥ 23.1
+- CMake ≥ 3.31
+
+**Note:** Minimum versions apply to all platforms, not just Linux. Previous versions may work, but compatibility is not guaranteed.
 
 ### macOS
+- macOS 26 or higher
 - CMake
-- [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools)
+- Latest version of Xcode or [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools) (includes Git and Clang)
+
+### Windows
+- Windows 10 or higher
+- [MSYS2](https://www.msys2.org/) [CLANG64 environment](https://www.msys2.org/docs/environments/)
+- Git (install package `mingw-w64-clang-x86_64-git` or install directly in Windows)
+- Clang (install package `mingw-w64-clang-x86_64-clang`)
+- CMake (install package `mingw-w64-clang-x86_64-cmake` or install directly in Windows)
+
+**Note:** Add `MSYS2_PATH_TYPE=inherit` to your Windows environment variables if you want to use programs in your Windows PATH in MSYS2 environments.
 
 ## Compilation and Installation
 
@@ -35,6 +46,8 @@ cmake --build build
 ```
 sudo cmake --install build --strip
 ```
+
+**Note:** This installation method is not supported on Windows. Manually copy the `wol.exe` executable into your desired directory instead. You may wish to strip it of debug symbols by running `strip build/wol.exe` beforehand.
 
 ### Clean After Compilation and/or Installation
 
