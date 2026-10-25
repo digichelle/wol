@@ -145,9 +145,9 @@ vector<unsigned char> ParseMAC(const string& mac) {
 
     // Split the string by ':' and convert each part to a byte
     while (end != string::npos && count < 5) {
-        string byteStr = mac.substr(start, end - start);
+        string ByteStr = mac.substr(start, end - start);
         try {
-            unsigned char byte = static_cast<unsigned char>(stoi(byteStr, nullptr, 16));
+            unsigned char byte = static_cast<unsigned char>(stoi(ByteStr, nullptr, 16));
             bytes.push_back(byte);
         } catch (...) {
             return {}; // Return empty if conversion fails
@@ -163,9 +163,9 @@ vector<unsigned char> ParseMAC(const string& mac) {
     }
 
     // Get the last part
-    string byteStr = mac.substr(start);
+    string ByteStr = mac.substr(start);
     try {
-        unsigned char byte = static_cast<unsigned char>(stoi(byteStr, nullptr, 16));
+        unsigned char byte = static_cast<unsigned char>(stoi(ByteStr, nullptr, 16));
         bytes.push_back(byte);
     } catch (...) {
         return {};
@@ -203,8 +203,8 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
 
 #ifdef _WIN32
     // Initialize Winsock
-    WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+    WSADATA WSAData;
+    if (WSAStartup(MAKEWORD(2, 2), &WSAData) != 0) {
         cerr << "Error: Could not initialize Winsock" << endl << endl;
         return false;
     }
