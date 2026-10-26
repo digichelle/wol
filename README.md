@@ -4,26 +4,29 @@ A simple Wake-on-LAN utility written in C++. Compatible with Linux, macOS, and W
 ## Requirements
 
 ### Linux
-- Git ≥ 2.54.0
-- Clang ≥ 21.0.0
-- lld ≥ 23.1
-- CMake ≥ 3.31
-
-**Note:** Minimum versions apply to all platforms, not just Linux. Previous versions may work, but compatibility is not guaranteed.
+- [Git](https://git-scm.com) ≥ 2.54.0
+- [Clang](https://clang.llvm.org/) ≥ 21.0.0
+- [lld](https://lld.llvm.org) ≥ 21.0.0
+- [CMake](https://cmake.org) ≥ 3.31
 
 ### macOS
-- macOS 26 or higher
-- CMake
-- Latest version of Xcode or [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools) (includes Git and Clang)
+- macOS 26 Tahoe or higher (previous versions may work, but have not been tested)
+- CMake ≥ 3.31
+- Latest version of [Xcode](https://developer.apple.com/xcode/) or [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools) (includes Git and Clang)
 
 ### Windows
 - Windows 10 or higher
 - [MSYS2](https://www.msys2.org/) [CLANG64 environment](https://www.msys2.org/docs/environments/)
-- Git (install package `mingw-w64-clang-x86_64-git` or install directly in Windows)
-- Clang (install package `mingw-w64-clang-x86_64-clang`)
-- CMake (install package `mingw-w64-clang-x86_64-cmake` or install directly in Windows)
+- Git ≥ 2.54.0 (install package `mingw-w64-clang-x86_64-git` or install directly in Windows)
+- Clang ≥ 21.0.0 (install package `mingw-w64-clang-x86_64-clang`)
+- lld ≥ 21.0.0 (install package `mingw-w64-clang-x86_64-lld`)
+- CMake ≥ 3.31 (install package `mingw-w64-clang-x86_64-cmake` or install directly in Windows)
 
 **Note:** Add `MSYS2_PATH_TYPE=inherit` to your Windows environment variables if you want to use programs in your Windows PATH in MSYS2 environments.
+
+### Other
+
+It may be possible to compile and run this program on other UNIX/UNIX-like operating systems such as BSD, provided that all the requirements in the Linux section are met. However, this scenario has not been tested.
 
 ## Compilation and Installation
 
@@ -96,6 +99,8 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## Special Thanks
+
+This program is based on work by the following authors:
 
 - Andrei Maiboroda ([gumb0](https://github.com/gumb0))
 - Mohammad Mostafizur Rahman ([AsifMinar](https://github.com/AsifMinar))
