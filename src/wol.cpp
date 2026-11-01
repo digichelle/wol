@@ -1,34 +1,13 @@
-/* *****************************************************************************
-
-wol.cpp - Simple Wake-On-LAN utility
-Author: Michelle Catherine Marcó (digichelle)
-Source: https://github.com/digichelle/wol
-
-MIT LICENSE
+/*
+wol - Simple Wake-On-LAN utility
 Copyright © 2026 Michelle Catherine Marcó
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the “Software”), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-***************************************************************************** */
+MIT License: https://opensource.org/license/MIT
+*/
 
 #include <iostream>         // Basic I/O
 #include <algorithm>        // Provides all_of()
 #include <cstring>          // Provides memset()
+#include <filesystem>       // Provides filesystem functions
 #include <regex>            // Provides regular expression support
 #include <string>           // String handling
 #include <vector>           // Byte storage
@@ -45,32 +24,47 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using namespace std;
 
+// Function to strip path from executable name
+string StripPath(const auto progpath) {
+    filesystem::path p(progpath);
+    string prog = p.stem().string();
+    return prog;
+}
+
 // Function to display help
 void PrintUsage(const string& progname) {
     cout <<
-        progname << " - Simple Wake-On-LAN utility\n" <<
-        "Usage: " << progname << " [OPTIONS] ... MAC-ADDRESS\n" <<
-        "    -h, --help     Display this help and exit\n" <<
-        "    -v, --version  Display version and license information\n" <<
-        "    -i, --ip       Specify broadcast IP address\n" <<
-        "    -p, --port     Specify port number\n" <<
-        "    -q, --quiet    Quiet mode\n" <<
+        StripPath(progname) << " - Simple Wake-On-LAN utility\n" <<
         "\n" <<
-        "MAC address must be in the form xx:xx:xx:xx:xx:xx, where xx is a zero-padded\n" <<
-        "hexadecimal number from 00 to ff.\n" <<
+        "Usage: " << StripPath(progname) << " [OPTIONS] ... MAC-ADDRESS\n" <<
         "\n" <<
-        "IP address, if specified, must be in the form x.x.x.x, where x is a\n" <<
-        "decimal number from 0 to 255.\n\n";
+        "    -h, --help      Display this help and exit\n" <<
+        "    -v, --version   Display version and license information\n" <<
+        "    -i, --ip        Specify broadcast IP address\n" <<
+        "    -p, --port      Specify port number\n" <<
+        "    -q, --quiet     Quiet mode\n" <<
+        "\n" <<
+        "Notes:\n" <<
+        "\n" <<
+        "- MAC address must be in the form xx:xx:xx:xx:xx:xx, where xx is a zero-padded\n" <<
+        "  hexadecimal number from 00 to ff.\n" <<
+        "\n" <<
+        "- IP address, if specified, must be in the form x.x.x.x, where x is a decimal\n" <<
+        "  number from 0 to 255.\n" <<
+        "\n" <<
+        "- IP address is a broadcast IP address (default: 255.255.255.255).  It is NOT\n" <<
+        "  the IP address of the target computer.\n" <<
+        "\n";
     exit(0);
 }
 
 // Function to display version information
 void PrintVersion(const string& progname) {
     cout <<
-        progname << " - Simple Wake-ON-LAN utility\n" <<
-        "Version 1.0β7\n" <<
+        StripPath(progname) << " - Simple Wake-ON-LAN utility\n" <<
+        "Version 1.0β8\n" <<
         "Copyright © 2026 Michelle Catherine Marcó\n" <<
-        "MIT License: https://opensource.org/license/MIT\n\n";
+        "MIT License: https://opensource.org/license/MIT\n";
     exit(0);
 }
 
@@ -205,14 +199,14 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
     // Initialize Winsock
     WSADATA WSAData;
     if (WSAStartup(MAKEWORD(2, 2), &WSAData) != 0) {
-        cerr << "Error: Could not initialize Winsock" << endl << endl;
+        cerr << "Error: Could not initialize Winsock" << endl;
         return false;
     }
 
     // Create a UDP socket
     SOCKET sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sock == INVALID_SOCKET) {
-        cerr << "Error: Could not create socket, error code: " << WSAGetLastError() << endl << endl;
+        cerr << "Error: Could not create socket, error code: " << WSAGetLastError() << endl;
         WSACleanup();
         return false;
     }
@@ -220,7 +214,7 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
     // Allow the socket to send broadcast messages
     BOOL broadcast = TRUE;
     if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char*)&broadcast, sizeof(broadcast)) == SOCKET_ERROR) {
-        cerr << "Error: Could not set broadcast option, error code: " << WSAGetLastError() << endl << endl;
+        cerr << "Error: Could not set broadcast option, error code: " << WSAGetLastError() << endl;
         closesocket(sock);
         WSACleanup();
         return false;
@@ -229,14 +223,14 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
     // Create a UDP socket
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
-        cerr << "Error: Could not create socket" << endl << endl;
+        cerr << "Error: Could not create socket" << endl;
         return false;
     }
 
     // Allow the socket to send broadcast messages
     int broadcast = 1;
     if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0) {
-        cerr << "Error: Could not set broadcast option" << endl << endl;
+        cerr << "Error: Could not set broadcast option" << endl;
         close(sock);
         return false;
     }
@@ -249,7 +243,7 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
     addr.sin_port = htons(port);
 #ifdef _WIN32
     if (inet_pton(AF_INET, ip.c_str(), &addr.sin_addr) <= 0) {
-        cerr << "Error: Invalid broadcast address" << endl << endl;
+        cerr << "Error: Invalid broadcast address" << endl;
         closesocket(sock);
         WSACleanup();
         return false;
@@ -262,7 +256,7 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
 #ifdef _WIN32
     int sent = sendto(sock, (const char*)packet.data(), packet.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
     if (sent == SOCKET_ERROR) {
-        cerr << "Error: Failed to send packet, error code: " << WSAGetLastError() << endl << endl;
+        cerr << "Error: Failed to send packet, error code: " << WSAGetLastError() << endl;
         closesocket(sock);
         WSACleanup();
         return false;
@@ -270,7 +264,7 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
 #else
     ssize_t sent = sendto(sock, packet.data(), packet.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
     if (sent < 0) {
-        cerr << "Error: Failed to send packet" << endl << endl;
+        cerr << "Error: Failed to send packet" << endl;
         close(sock);
         return false;
     }
@@ -288,7 +282,14 @@ bool SendPacket(const vector<unsigned char>& packet, const string& ip, unsigned 
 }
 
 int main(int argc, char * const argv[]) {
+
+    // Set console output to UTF-8
+#ifdef _WIN32
+    system("chcp 65001 >NUL");
+#else
     setlocale(LC_ALL, "en_US.UTF-8");
+#endif
+
     try {
 
         // Initialize variables with defaults
@@ -332,10 +333,10 @@ int main(int argc, char * const argv[]) {
                     port = strtol(optarg, NULL, 0);
                     break;
                 case '?': // Unrecognized option
-                    cerr << "Unknown option '-" << static_cast<char>(optopt) << "'" << endl << endl;
+                    cerr << "Unknown option '-" << static_cast<char>(optopt) << "'" << endl;
                     exit(1);
                 default:
-                    cerr << "Internal error" << endl << endl;
+                    cerr << "Internal error" << endl;
                     exit(1);
             }
         }
@@ -403,7 +404,7 @@ int main(int argc, char * const argv[]) {
                     "Wake-on-LAN magic packet sent!\n" <<
                     "    MAC Address: " << mac << "\n" <<
                     "    IP Address:  " << IPAddress << "\n" <<
-                    "    Port:        " << dec << port << "\n\n";
+                    "    Port:        " << dec << port << "\n";
             }
 
         } else {
