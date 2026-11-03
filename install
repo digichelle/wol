@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# wol install script
+# Copyright © 2026 Michelle Catherine Marcó
+# MIT License: https://opensource.org/license/MIT
+
+# Is this running on Windows (specifically, in MSYS2)?
+if [[ $(uname) =~ "MINGW64" ]]; then
+    win="true"
+fi
+
+# If Windows and path argument is empty, return an error
+# If other OS and path argument is empty, set path to /usr/local/bin
+# Otherwise, use path argument
+if [[ -z $1 ]]; then
+    if [[ $win == "true" ]]; then
+        echo "Error: no path specified" >&2
+        exit 1
+    else
+        path="/usr/local/bin"
+    fi
+else
+    path=$1
+fi
+
+# If Windows, binary is wol.exe
+# Otherwise, binary is wol
+if [[ $win == "true" ]]; then
+    bin="wol.exe"
+else
+    bin="wol"
+fi
+
+# Run strip and copy commands
+strip ./build/$bin
+cp ./build/$bin $path

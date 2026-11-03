@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# wol configure script
+# Copyright © 2026 Michelle Catherine Marcó
+# MIT License: https://opensource.org/license/MIT
+
+# Is this running on macOS or Windows?
+if [[ $(uname) =~ "Darwin" ]]; then
+    os="macos"
+fi
+if [[ $(uname) =~ "MINGW64" ]]; then
+    os="win"
+fi
+
+# If a compiler is specified, and not on macOS or Windows, use it
+# Otherwise, CMake will autodetect it
+case $os in
+
+    macos | win)
+        cmake -S . -B build --fresh
+    ;;
+
+    *)
+        case $1 in
+
+            clang | clang++ )
+                CC=clang CXX=clang++ cmake -S . -B build --fresh
+            ;;
+
+            gcc | g++ | gnu )
+                CC=gcc CXX=g++ cmake -S . -B build --fresh
+            ;;
+
+            *)
+                cmake -S . -B build --fresh
+            ;;
+
+        esac
+
+    ;;
+
+esac

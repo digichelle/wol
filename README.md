@@ -4,25 +4,27 @@ A simple Wake-on-LAN utility written in C++. Compatible with Linux, macOS, and W
 ## Requirements
 
 ### Linux
-- [Git](https://git-scm.com) ≥ 2.54.0
-- [Clang](https://clang.llvm.org/) ≥ 21.0.0
-- [lld](https://lld.llvm.org) ≥ 21.0.0
+- One of the following compiler and linker combinations:
+	- [Clang](https://clang.llvm.org/) ≥ 21.0.0 and [lld](https://lld.llvm.org) ≥ 21.0.0
+	- [GCC](https://gcc.gnu.org) ≥ 16.2.0 and [mold](https://github.com/rui314/mold) ≥ 3.0.0
 - [CMake](https://cmake.org) ≥ 3.31
+- [Git](https://git-scm.com) ≥ 2.54.0
 
 ### macOS
 - macOS 26 Tahoe or higher (previous versions may work, but have not been tested)
+- Latest version of [Xcode](https://developer.apple.com/xcode/) or [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools) (includes Clang and Git)
 - CMake ≥ 3.31
-- Latest version of [Xcode](https://developer.apple.com/xcode/) or [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools) (includes Git and Clang)
 
 ### Windows
 - Windows 10 or higher
 - [MSYS2](https://www.msys2.org/) [CLANG64 environment](https://www.msys2.org/docs/environments/)
-- Git ≥ 2.54.0 (install package `mingw-w64-clang-x86_64-git` or install directly in Windows)
 - Clang ≥ 21.0.0 (install package `mingw-w64-clang-x86_64-clang`)
 - lld ≥ 21.0.0 (install package `mingw-w64-clang-x86_64-lld`)
 - CMake ≥ 3.31 (install package `mingw-w64-clang-x86_64-cmake` or install directly in Windows)
+- Git ≥ 2.54.0 (install package `mingw-w64-clang-x86_64-git` or install directly in Windows)
 
-**Note:** Add `MSYS2_PATH_TYPE=inherit` to your Windows environment variables if you want to use programs in your Windows PATH in MSYS2 environments.
+> [!NOTE]
+> Add `MSYS2_PATH_TYPE=inherit` to your Windows environment variables if you want to use programs in your Windows PATH in MSYS2 environments.
 
 ### Other
 
@@ -35,27 +37,31 @@ It may be possible to compile and run this program on other UNIX/UNIX-like opera
 ```
 git clone https://github.org/digichelle/wol
 cd wol
-cmake -S . -B build --fresh
+./configure
 ```
+
+> [!NOTE]
+> On Linux, automatic compiler detection may be overridden. Run `./configure clang` to use Clang or `./configure gcc` to use GCC.
 
 ### Compile
 
 ```
-cmake --build build
+./compile
 ```
 
 ### Install
 
 ```
-sudo cmake --install build --strip
+./install <PATH>
 ```
 
-**Note:** This installation method is not supported on Windows. Manually copy the `wol.exe` executable into your desired directory instead. You may wish to strip it of debug symbols by running `strip build/wol.exe` beforehand.
+> [!NOTE]
+> On Linux and macOS, specifying a path is optional, and the default path is `/usr/local/bin`. Using `sudo` may be necessary. On Windows, specifying a path is mandatory. Use the format `/c/your/path/here` instead of `C:\your\path\here`.
 
 ### Clean After Compilation and/or Installation
 
 ```
-cmake --build build --target clean
+rm -rf build
 ```
 
 ## Usage

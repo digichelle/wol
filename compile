@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# wol compile script
+# Copyright © 2026 Michelle Catherine Marcó
+# MIT License: https://opensource.org/license/MIT
+
+cmake --build build
