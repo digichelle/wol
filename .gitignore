@@ -52,6 +52,9 @@ compile_commands.json
 Makefile
 makefile
 
+# clangd LSP configuration
+.clangd
+
 # Temporary files
 *.tmp
 *.log

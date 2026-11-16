@@ -8,12 +8,19 @@ A simple Wake-on-LAN utility written in C++. Compatible with Linux, macOS, and W
 	- [Clang](https://clang.llvm.org/) ≥ 21.0.0 and [lld](https://lld.llvm.org) ≥ 21.0.0
 	- [GCC](https://gcc.gnu.org) ≥ 16.2.0 and [mold](https://github.com/rui314/mold) ≥ 3.0.0
 - [CMake](https://cmake.org) ≥ 3.31
-- [Git](https://git-scm.com) ≥ 2.54.0
+
+> [!NOTE]
+> It may be possible to compile and run this program on other UNIX/UNIX-like operating systems such as BSD, provided that all the requirements in this section are met.
 
 ### macOS
-- macOS 26 Tahoe or higher (previous versions may work, but have not been tested)
-- Latest version of [Xcode](https://developer.apple.com/xcode/) or [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools) (includes Clang and Git)
+- macOS 26 Tahoe or higher
+- One of the following:
+	- [Xcode](https://developer.apple.com/xcode/) 26 or higher
+	- [Xcode Command Line Tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools) 26 or higher
 - CMake ≥ 3.31
+
+> [!NOTE]
+> Previous versions of macOS and Xcode may work, but have not been tested.
 
 ### Windows
 - Windows 10 or higher
@@ -21,22 +28,15 @@ A simple Wake-on-LAN utility written in C++. Compatible with Linux, macOS, and W
 - Clang ≥ 21.0.0 (install package `mingw-w64-clang-x86_64-clang`)
 - lld ≥ 21.0.0 (install package `mingw-w64-clang-x86_64-lld`)
 - CMake ≥ 3.31 (install package `mingw-w64-clang-x86_64-cmake` or install directly in Windows)
-- Git ≥ 2.54.0 (install package `mingw-w64-clang-x86_64-git` or install directly in Windows)
 
-> [!NOTE]
+> [!TIP]
 > Add `MSYS2_PATH_TYPE=inherit` to your Windows environment variables if you want to use programs in your Windows PATH in MSYS2 environments.
-
-### Other
-
-It may be possible to compile and run this program on other UNIX/UNIX-like operating systems such as BSD, provided that all the requirements in the Linux section are met. However, this scenario has not been tested.
 
 ## Compilation and Installation
 
 ### Initial Setup
 
 ```
-git clone https://github.org/digichelle/wol
-cd wol
 ./configure
 ```
 
